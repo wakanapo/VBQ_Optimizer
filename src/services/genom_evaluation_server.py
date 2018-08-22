@@ -44,12 +44,15 @@ def model_selector(model_name, weights=True):
     if model_name == 'vgg_like' or model_name == 'hinton':
         if model_name == 'vgg_like':
             model_class = cifar10.Vgg_like();
+            print("Model: vgg_like")
         else:
             model_class = cifar10.Hinton();
+            print("Model: hinton")
         model = model_class.build((32, 32, 3))
         if weights:
             model.load_weights('data/'+model_class.name+'.h5')
     else:
+        print("Model: vgg16")
         if weights:
             model = VGG16(weights='data/vgg16.h5')
         else:
@@ -66,7 +69,7 @@ def calculate_fitness(genom, model_name):
         model.compile(optimizer=optimizers.Adam(),
                       loss='categorical_crossentropy',
                       metrics=['accuracy'])
-        score = model.evaluate(val_X, val_y)
+        score = model.evaluate(val_X, val_y, verbose=0)
     K.clear_session()
     return score[1]
 

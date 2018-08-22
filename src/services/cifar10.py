@@ -76,7 +76,7 @@ def read_data():
     x_test = x_test.astype('float32')
     x_train /= 255
     x_test /= 255
-    return x_train, y_train, x_test, y_test
+    return x_train, y_train, x_test[:5000], y_test[:5000]
 
 def run(my_model):
     x_train, y_train, x_test, y_test = read_data()
