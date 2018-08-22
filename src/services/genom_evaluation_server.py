@@ -21,6 +21,7 @@ _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 val_X = []
 val_y = []
 g_W = []
+g_model_name = ""
 
 def converter(partition):
     def f(arr):
@@ -73,9 +74,9 @@ def calculate_fitness(genom, model_name):
 class GenomEvaluationServicer(genom_pb2_grpc.GenomEvaluationServicer):
     def GetIndividual(self, request, context):
         return genom_pb2.Individual(genom=request,
-                               evaluation=calculate_fitness(request))
+                               evaluation=calculate_fitness(request, g_model_name))
 
-def serve(model_name):
+def serve():
     global val_X, val_y, g_W
     val_X, val_y = data_selector(model_name)
     val_X = preprocess_input(val_X)
@@ -101,5 +102,6 @@ if __name__=='__main__':
     if len(argv) < 2:
         print("Please set model name.")
         exit()
-    serve(argv[1])
+    g_model_name = argv[1]
+    serve()
 
