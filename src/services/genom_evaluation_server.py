@@ -44,7 +44,7 @@ def calculate_fitness(genom):
         model.compile(optimizer=optimizers.Adam(),
                       loss='categorical_crossentropy',
                       metrics=['accuracy'])
-        score = model.evaluate(val_X[g_offset:g_offset+10000], val_y[g_offset:g_offset+10000])
+        score = model.evaluate(val_X, val_y)
     K.clear_session()
     return score[1]
 
@@ -55,7 +55,7 @@ class GenomEvaluationServicer(genom_pb2_grpc.GenomEvaluationServicer):
 
 def serve():
     global val_X, val_y, g_W
-    val_X, val_y = imagenet.load()
+    val_X, val_y = imagenet.load(g_offset)
     print("data load: success.")
     model = VGG16(weights='data/vgg16.h5')
     g_W = model.get_weights()
