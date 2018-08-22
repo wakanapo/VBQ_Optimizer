@@ -38,7 +38,7 @@ def data_selector(model_name):
     if model_name == 'vgg_like' or model_name == 'hinton':
         _, _, val_X, val_y = cifar10.read_data()
     else:
-        val_X, val_y = imagenet.load(g_offset)
+        val_X, val_y = imagenet.load()
     return val_X, val_y
 
 def model_selector(model_name, weights=True):
