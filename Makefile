@@ -1,6 +1,6 @@
 CXX := g++
 PROTOC := protoc
-CXXFLAGS := -std=c++14 -g3 -Wall -Wextra -O2 -pthread
+CXXFLAGS := -std=c++11 -g3 -Wall -Wextra -O2 -pthread
 LDFLAGS := -L/usr/local/lib -lgrpc++ `pkg-config --cflags --libs protobuf`
 
 INCLUDES := -I./src
