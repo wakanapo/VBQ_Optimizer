@@ -25,21 +25,23 @@ def run(genom_name, model_num):
             print('Server Error.')
             return
         
-    client = subprocess.Popen('./bin/client {}'.format(genom_name), shell=True,
+    for _ in range(5):
+        client = subprocess.Popen('./bin/client {}'.format(genom_name), shell=True,
                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    while True:
-        s_line = non_blocking_read(server.stdout)
-        c_line = non_blocking_read(client.stdout)
-        if s_line:
-            sys.stdout.write(s_line.decode('utf-8'))
-        elif server.poll() is not None:
-            print('Server Error.')
-            return
-        if c_line:
-            sys.stdout.write(c_line.decode('utf-8'))
-        elif client.poll() is not None:
-            server.kill()
-            return
+        while True:
+            s_line = non_blocking_read(server.stdout)
+            c_line = non_blocking_read(client.stdout)
+            if s_line:
+                sys.stdout.write(s_line.decode('utf-8'))
+            elif server.poll() is not None:
+                print('Server Error.')
+                return
+            if c_line:
+                sys.stdout.write(c_line.decode('utf-8'))
+            elif client.poll() is not None:
+                break
+
+        server.kill()
 
         
 if __name__=='__main__':
