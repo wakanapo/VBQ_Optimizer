@@ -1,7 +1,7 @@
 CXX := g++
 PROTOC := protoc
-CXXFLAGS := -std=c++11 -g3 -Wall -Wextra -O2 -pthread
-LDFLAGS := `pkg-config --cflags --libs protobuf grpc++`
+CXXFLAGS := -std=c++11 -g3 -Wall -Wextra -O2 -pthread `pkg-config --cflags`
+LDFLAGS := `pkg-config --libs protobuf grpc++`
 
 INCLUDES := -I./src
 BINDIR := bin
