@@ -56,6 +56,7 @@ class GenomEvaluationServicer(genom_pb2_grpc.GenomEvaluationServicer):
 def serve():
     global val_X, val_y, g_W
     val_X, val_y = imagenet.load(g_offset)
+    val_X = preprocess_input(val_X)
     print("data load: success.")
     model = VGG16(weights='data/vgg16.h5')
     g_W = model.get_weights()
