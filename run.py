@@ -13,7 +13,7 @@ def non_blocking_read(output):
         return ""
 
 def run(genom_name):
-    server = subprocess.Popen('python src/python/services/genom_evaluation_server.py',
+    server = subprocess.Popen('python src/services/genom_evaluation_server.py',
                             shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     while True:
         s_line = non_blocking_read(server.stdout)
@@ -25,7 +25,7 @@ def run(genom_name):
             print('Server Error.')
             return
         
-    client = subprocess.Popen('./bin/ga {}'.format(genom_name), shell=True,
+    client = subprocess.Popen('./bin/client {}'.format(genom_name), shell=True,
                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     while True:
         s_line = non_blocking_read(server.stdout)
