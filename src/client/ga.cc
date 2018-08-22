@@ -77,8 +77,10 @@ std::vector<Genom> GeneticAlgorithm::crossover(const Genom& mom, const Genom& da
   /*
     二点交叉を行う関数
   */
-  int center = rand() % (genom_length_ - 2) + 1;
-  int range = rand() % std::min(center, (genom_length_ - center));
+  // 両端はcenterに選ばない
+  std::uniform_int_distribution<> dist(1, genom_length_-2);
+  int center = dist(mt);
+  int range = std::min({(dist(mt)+1)/2, center, (genom_length_ - center)});
   std::vector<float> genom_one = mom.getGenom();
   std::vector<float> genom_two = dad.getGenom();
   auto inc_itr = std::lower_bound(genom_two.begin(), genom_two.end(),
@@ -171,6 +173,9 @@ void GeneticAlgorithm::nextGenerationGeneCreate() {
     /* 交叉 */
     if ((int)new_genoms.size() <= genom_num_ - 2) {
       int idx2 = dist(mt);
+      while (idx2 == idx) {
+        idx2 = dist(mt);
+      }
       auto genoms = crossover(genoms_[idx], genoms_[idx2]);
       std::copy(genoms.begin(), genoms.end(), std::back_inserter(new_genoms));
       continue;
@@ -271,7 +276,7 @@ void GeneticAlgorithm::run(std::string filepath, GenomEvaluationClient client) {
 }
 
 std::string timestamp() {
-  std::time_t t = time(nullptr);
+  std::time_t t = time(NULL);
   const tm* lt = localtime(&t);
   std::stringstream ss;
   ss << lt->tm_year-100;

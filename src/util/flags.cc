@@ -56,7 +56,8 @@ void Options::ParseCommandLine(int argc, char* argv[]) {
         g_mutation_rate = StringToFloat(flag_value); }));
   flags.insert(std::make_pair("max_generation", [](std::string flag_value) {
         g_max_generation = StringToInt(flag_value);}));
-  SetFlag(argv[2], flags);
+  if (argc > 2)
+    SetFlag(argv[2], flags);
 }
 
 float Options::GetCrossRate() {
