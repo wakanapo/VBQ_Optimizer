@@ -2,4 +2,4 @@ data/
 bin/
 obj/
 src/protos/*.pb.*
-vbq/
+work/

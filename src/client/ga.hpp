@@ -22,7 +22,7 @@ private:
 class GeneticAlgorithm {
 public:
   static GeneticAlgorithm setup();
-  std::vector<Genom> crossover(const Genom& parent) const;
+  std::vector<Genom> crossover(const Genom& mom, const Genom& dad) const;
   Genom mutation(const Genom& parent) const;
   void nextGenerationGeneCreate();
   int randomGenomIndex() const;

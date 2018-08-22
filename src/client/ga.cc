@@ -73,15 +73,14 @@ void GeneticAlgorithm::moveGenoms(std::vector<Genom>&& genoms) {
   genoms_ = std::move(genoms);
 }
 
-std::vector<Genom> GeneticAlgorithm::crossover(const Genom& parent) const {
+std::vector<Genom> GeneticAlgorithm::crossover(const Genom& mom, const Genom& dad) const {
   /*
     二点交叉を行う関数
   */
   int center = rand() % (genom_length_ - 2) + 1;
   int range = rand() % std::min(center, (genom_length_ - center));
-  int spouse = rand() % (genom_num_ / 2);
-  std::vector<float> genom_one = parent.getGenom();
-  std::vector<float> genom_two = genoms_[spouse].getGenom();
+  std::vector<float> genom_one = mom.getGenom();
+  std::vector<float> genom_two = dad.getGenom();
   auto inc_itr = std::lower_bound(genom_two.begin(), genom_two.end(),
                                   genom_one[center]);
   auto dic_itr = inc_itr;
@@ -171,7 +170,8 @@ void GeneticAlgorithm::nextGenerationGeneCreate() {
 
     /* 交叉 */
     if ((int)new_genoms.size() <= genom_num_ - 2) {
-      auto genoms = crossover(genoms_[idx]);
+      int idx2 = dist(mt);
+      auto genoms = crossover(genoms_[idx], genoms_[idx2]);
       std::copy(genoms.begin(), genoms.end(), std::back_inserter(new_genoms));
       continue;
     }
