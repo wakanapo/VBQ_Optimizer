@@ -38,6 +38,7 @@ def data_selector(model_name):
         _, _, val_X, val_y = cifar10.read_data()
     else:
         val_X, val_y = imagenet.load()
+        val_X = preprocess_input(val_X)
     return val_X, val_y
 
 def model_selector(model_name, weights=True):
@@ -87,7 +88,6 @@ class GenomEvaluationServicer(genom_pb2_grpc.GenomEvaluationServicer):
 def serve(model_name):
     global val_X, val_y, g_W
     val_X, val_y = data_selector(model_name)
-    val_X = preprocess_input(val_X)
     print("data load: success.")
     model = model_selector(model_name, weights=True)
     g_W = model.get_weights()
