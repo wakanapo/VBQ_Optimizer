@@ -21,7 +21,6 @@ _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 val_X = []
 val_y = []
 g_W = []
-g_model_name = ""
 
 def converter(partition):
     def f(arr):
@@ -72,11 +71,15 @@ def calculate_fitness(genom, model_name):
     return score[1]
 
 class GenomEvaluationServicer(genom_pb2_grpc.GenomEvaluationServicer):
+    def __init__(self, genom_name):
+        self.genom_name_ = genom_name
+        
     def GetIndividual(self, request, context):
         return genom_pb2.Individual(genom=request,
-                               evaluation=calculate_fitness(request, g_model_name))
+                                    evaluation=calculate_fitness(request,
+                                                                 self.genom_name_))
 
-def serve():
+def serve(model_name):
     global val_X, val_y, g_W
     val_X, val_y = data_selector(model_name)
     val_X = preprocess_input(val_X)
@@ -88,7 +91,7 @@ def serve():
     sys.stdout.flush()
     server = grpc.server(futures.ThreadPoolExecutor())
     genom_pb2_grpc.add_GenomEvaluationServicer_to_server(
-        GenomEvaluationServicer(), server)
+        GenomEvaluationServicer(model_name), server)
     server.add_insecure_port('[::]:50051')
     server.start()
     try:
@@ -102,6 +105,5 @@ if __name__=='__main__':
     if len(argv) < 2:
         print("Please set model name.")
         exit()
-    g_model_name = argv[1]
-    serve()
+    serve(argv[1])
 
