@@ -2,3 +2,5 @@ data/
 bin/
 obj/
 src/protos/*.pb.*
+src/protos/__pycache__/
+vbq/
