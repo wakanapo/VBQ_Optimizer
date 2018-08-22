@@ -33,11 +33,33 @@ def converter(partition):
         return arr
     return f
 
+def data_selector(model_name):
+    if model_name == 'vgg_like' or model_name == 'hinton':
+        _, _, val_X, val_y = cifar10.read_data()
+    else:
+        val_X, val_y = imagenet.load(g_offset)
+    return val_X, val_y
 
-def calculate_fitness(genom):
+def model_selector(model_name, weights=True):
+    if model_name == 'vgg_like' or model_name == 'hinton':
+        if model_name == 'vgg_like':
+            model_class = cifar10.Vgg_like();
+        else:
+            model_class = cifar10.Hinton();
+        model = model_class.build((32, 32, 3))
+        if weights:
+            model.load_weights('data/'+model_class.name+'.h5')
+    else:
+        if weights:
+            model = VGG16(weights='data/vgg16.h5')
+        else:
+            model = VGG16(weights=None)
+    return model
+
+def calculate_fitness(genom, model_name):
     with K.get_session().graph.as_default():
         print("start evaluation!")
-        model = VGG16(weights=None)
+        model = model_selector(model_name, weights=False)
         W_q = list(map(converter(genom.gene), copy.deepcopy(g_W)))
         print("quantize: success.")
         model.set_weights(W_q)
@@ -53,12 +75,12 @@ class GenomEvaluationServicer(genom_pb2_grpc.GenomEvaluationServicer):
         return genom_pb2.Individual(genom=request,
                                evaluation=calculate_fitness(request))
 
-def serve():
+def serve(model_name):
     global val_X, val_y, g_W
-    val_X, val_y = imagenet.load(g_offset)
+    val_X, val_y = data_selector(model_name)
     val_X = preprocess_input(val_X)
     print("data load: success.")
-    model = VGG16(weights='data/vgg16.h5')
+    model = model_selector(model_name, weights=True)
     g_W = model.get_weights()
     print("model load: success.")
     print("Server Ready")
@@ -76,9 +98,8 @@ def serve():
 
 if __name__=='__main__':
     argv = sys.argv
-    if len(argv) > 1:
-        g_offset = int(sys.argv[1])
-    else:
-        g_offset = 0
-    serve()
+    if len(argv) < 2:
+        print("Please set model name.")
+        exit()
+    serve(argv[1])
 

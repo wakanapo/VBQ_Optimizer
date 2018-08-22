@@ -7,10 +7,10 @@ from keras.utils import np_utils
 from tqdm import tqdm
 import pickle
 
-def load(offset):
+def load():
     with open("data/ILSVRC2012/imagenet_val_labels_for_keras.pkl", 'rb') as f:
         labels = pickle.load(f)
-    labels = np.identity(1000)[labels[offset:offset+10000]]
+    labels = np.identity(1000)[labels[:10000]]
     
     imgs = []
     for i in tqdm(range(len(labels))):

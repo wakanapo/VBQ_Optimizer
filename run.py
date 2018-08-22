@@ -12,8 +12,8 @@ def non_blocking_read(output):
     except:
         return ""
 
-def run(genom_name):
-    server = subprocess.Popen('python src/services/genom_evaluation_server.py',
+def run(genom_name, model_num):
+    server = subprocess.Popen('python src/services/genom_evaluation_server.py {}'.format(model_num),
                             shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     while True:
         s_line = non_blocking_read(server.stdout)
@@ -44,8 +44,8 @@ def run(genom_name):
         
 if __name__=='__main__':
     argv = sys.argv
-    if len(argv) != 2:
-        print('Usage: python ga_executor.py <genom name>')
+    if len(argv) != 3:
+        print('Usage: python ga_executor.py <genom name> <model name>')
         exit()
-    run(argv[1])
+    run(argv[1], argv[2])
 
