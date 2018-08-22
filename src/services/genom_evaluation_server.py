@@ -51,10 +51,12 @@ def model_selector(model_name, weights=True):
         model = model_class.build((32, 32, 3))
         if weights:
             model.load_weights('data/'+model_class.name+'.h5')
+            print("load weights: success.")
     else:
         print("Model: vgg16")
         if weights:
             model = VGG16(weights='data/vgg16.h5')
+            print("load weights: success.")
         else:
             model = VGG16(weights=None)
     return model
