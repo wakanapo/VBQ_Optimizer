@@ -41,7 +41,7 @@ def run(genom_name, model_num):
             elif client.poll() is not None:
                 break
 
-        server.kill()
+    server.kill()
 
         
 if __name__=='__main__':
