@@ -249,8 +249,7 @@ void GeneticAlgorithm::run(std::string filepath, GenomEvaluationClient client) {
     }
 
     std::cerr << "Evaluating genoms on server ..... " << std::endl;
-    for (int i = 0; i < (int)genoms_.size(); ++i) {
-      auto& genom = genoms_[i];
+    for (Genom& genom: genoms_) {
       if (genom.getEvaluation() <= 0) {
         GenomEvaluation::Individual individual;
         GenomEvaluation::Genom* genes = new GenomEvaluation::Genom();
