@@ -21,7 +21,7 @@ private:
 
 class GeneticAlgorithm {
 public:
-  static GeneticAlgorithm setup();
+  static GeneticAlgorithm setup(std::string filepath);
   std::vector<Genom> crossover(const Genom& mom, const Genom& dad) const;
   Genom mutation(const Genom& parent) const;
   void nextGenerationGeneCreate();

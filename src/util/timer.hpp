@@ -11,7 +11,7 @@ class Timer {
 public:
   void start();
   void show(TimeUnit tu, std::string str);
-  void save(TimeUnit tu, std::string filepath);
+  void save(TimeUnit tu, std::string filename);
 private:
   std::chrono::time_point<std::chrono::steady_clock> start_;
 };

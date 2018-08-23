@@ -37,7 +37,7 @@ void Genom::setRandomEvaluation(float evaluation) {
   random_evaluation_ = evaluation;
 }
 
-GeneticAlgorithm GeneticAlgorithm::setup() {
+GeneticAlgorithm GeneticAlgorithm::setup(std::string filepath) {
   GenomEvaluation::Generation generation;
   std::fstream input(Options::GetFirstGenomFile(),
                      std::ios::in | std::ios::binary);
@@ -50,12 +50,13 @@ GeneticAlgorithm GeneticAlgorithm::setup() {
                       generation.individuals_size(),
                       Options::GetCrossRate(),Options::GetMutationRate(),
                       Options::GetMaxGeneration());
-  std::cerr << coloringText("Gene Length: " +
-                            std::to_string(generation.individuals(0).
-                                           genom().gene_size()), BLUE)
-            << coloringText(", Genom Num: " +
-                            std::to_string(generation.individuals_size()), BLUE)
-            << std::endl;
+  
+  std::ofstream ofs(filepath+"/metadata.txt", std::ios::app);
+  ofs << "Genom Length: " << ga.genom_length_ << std::endl;
+  ofs << "The number of Genom: " << ga.genom_num_ << std::endl;
+  ofs << "Crossover Rate: " << ga.cross_rate_ << std::endl;
+  ofs << "Mutation Rate: " << ga.mutation_rate_ << std::endl;
+  ofs << "The number of Generaion: " << ga.max_generation_ << std::endl;
   
   std::vector<Genom> genoms;
   for (int i = 0; i < generation.individuals_size(); ++i) {
@@ -211,7 +212,7 @@ void GeneticAlgorithm::print(int i, std::string filepath) {
   }
   average_ = sum / genom_num_;
 
-  std::ofstream ofs(filepath+"/metadata.txt", std::ios::app);
+  std::ofstream ofs(filepath+"/log.txt", std::ios::app);
   ofs << "generation: " << i << std::endl;
   ofs << "Min: " << min << std::endl;
   ofs << "Max: " << max << std::endl;
@@ -270,7 +271,7 @@ void GeneticAlgorithm::run(std::string filepath, GenomEvaluationClient client) {
     std::cerr << coloringText("OK!", GREEN) << std::endl;
     print(i, filepath);
     timer.show(SEC, "Generation" + std::to_string(i) + "\n");
-    timer.save(SEC, filepath);
+    timer.save(SEC, filepath+"/log.txt");
   }
 }
 
@@ -292,11 +293,11 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   Options::ParseCommandLine(argc, argv);
-  GeneticAlgorithm ga = GeneticAlgorithm::setup();
   std::stringstream filepath;
   filepath << "data/" << argv[1] << "_" << timestamp();
   mkdir(filepath.str().c_str(), 0777);
-
+  
+  GeneticAlgorithm ga = GeneticAlgorithm::setup(filepath.str());
   GenomEvaluationClient client(
     grpc::CreateChannel("localhost:50051",
                         grpc::InsecureChannelCredentials()));

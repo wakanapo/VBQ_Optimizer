@@ -22,9 +22,9 @@ void Timer::show(TimeUnit tu, std::string str) {
   std::cout << std::endl;
 }
 
-void Timer::save(TimeUnit tu, std::string filepath) {
+void Timer::save(TimeUnit tu, std::string filename) {
   auto diff = std::chrono::steady_clock::now() - start_;
-  std::ofstream ofs(filepath+"/metadata.txt", std::ios::app);
+  std::ofstream ofs(filename, std::ios::app);
   ofs << "Time: ";
   if (tu == MILLISEC)
     ofs << std::chrono::duration_cast<std::chrono::milliseconds>(diff).count()
