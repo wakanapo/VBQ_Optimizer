@@ -8,9 +8,9 @@
 typedef std::map<std::string, void(*)(std::string)> flags_type;
 
 namespace {
-  float g_mutation_rate = 0.1;
+  float g_mutation_rate = 0.2;
   float g_cross_rate = 0.5;
-  int g_max_generation = 100;
+  int g_max_generation = 200;
   std::string g_first_genom_file;
 }  // namespace
 
