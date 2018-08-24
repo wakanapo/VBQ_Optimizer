@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <map>
 #include <string>
 #include <sstream>
@@ -11,6 +12,8 @@ namespace {
   float g_mutation_rate = 0.2;
   float g_cross_rate = 0.5;
   int g_max_generation = 200;
+  bool g_resume = false;
+  int g_resume_from = 0;
   std::string g_first_genom_file;
 }  // namespace
 
@@ -46,9 +49,6 @@ void Options::ParseCommandLine(int argc, char* argv[]) {
     exit(1);
   }
 
-  std::stringstream filename;
-  filename << "data/" << argv[1] << ".pb";
-  g_first_genom_file = filename.str();
   flags_type flags;
   flags.insert(std::make_pair("cross_rate", [](std::string flag_value) {
         g_cross_rate = StringToFloat(flag_value); }));
@@ -56,8 +56,19 @@ void Options::ParseCommandLine(int argc, char* argv[]) {
         g_mutation_rate = StringToFloat(flag_value); }));
   flags.insert(std::make_pair("max_generation", [](std::string flag_value) {
         g_max_generation = StringToInt(flag_value);}));
+  flags.insert(std::make_pair("resume_from", [](std::string flag_value) {
+        g_resume = true;
+        g_resume_from = StringToInt(flag_value);}));
   if (argc > 2)
     SetFlag(argv[2], flags);
+  std::stringstream filename;
+  if (g_resume) {
+    filename << "data/" << argv[1] << "/generation" <<
+      std::setw(3) << std::setfill('0') << g_resume_from << ".pb";
+  } else {
+    filename << "data/" << argv[1] << ".pb";
+  }
+  g_first_genom_file = filename.str();
 }
 
 float Options::GetCrossRate() {
@@ -70,6 +81,14 @@ float Options::GetMutationRate() {
 
 int Options::GetMaxGeneration() {
   return g_max_generation;
+}
+
+bool Options::ResumeEnable() {
+  return g_resume;
+}
+
+int Options::ResumeFrom() {
+  return g_resume_from;
 }
 
 std::string Options::GetFirstGenomFile() {

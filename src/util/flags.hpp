@@ -8,5 +8,7 @@ public:
   static float GetCrossRate();
   static float GetMutationRate();
   static int GetMaxGeneration();
+  static bool ResumeEnable();
+  static int ResumeFrom();
   static std::string GetFirstGenomFile();
 };

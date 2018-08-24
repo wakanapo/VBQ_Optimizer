@@ -8,7 +8,7 @@ sys.path.append(pwd+'/src/protos')
 import genom_pb2
 import genom_pb2_grpc
 import grpc
-from keras.applications.vgg16 import VGG16, preprocess_input
+from keras.applications import vgg16, resnet50
 from keras import backend as K
 from keras import optimizers
 import numpy as np
@@ -38,10 +38,14 @@ def data_selector(model_name):
         _, _, val_X, val_y = cifar10.read_data()
     else:
         val_X, val_y = imagenet.load()
-        val_X = preprocess_input(val_X)
+        if model_name == 'vgg16':
+            val_X = vgg16.preprocess_input(val_X)
+        elif model_name == 'resnet50':
+            val_X = resnet50.preprocess_input(val_X)
     return val_X, val_y
 
 def model_selector(model_name, weights=True):
+    model = None
     if model_name == 'vgg_like' or model_name == 'hinton':
         if model_name == 'vgg_like':
             model_class = cifar10.Vgg_like();
@@ -54,12 +58,20 @@ def model_selector(model_name, weights=True):
             model.load_weights('data/'+model_class.name+'.h5')
             print("load weights: success.")
     else:
-        print("Model: vgg16")
-        if weights:
-            model = VGG16(weights='data/vgg16.h5')
-            print("load weights: success.")
-        else:
-            model = VGG16(weights=None)
+        if model_name == 'vgg16':
+            print("Model: vgg16")
+            if weights:
+                model = vgg16.VGG16(weights='data/vgg16_retraining.h5')
+                print("load weights: success.")
+            else:
+                model = vgg16.VGG16(weights=None)
+        elif model_name == 'resnet50':
+            print("Model: resnet50")
+            if weights:
+                model = resnet50.ResNet50(weights='data/resnet50_retraining.h5')
+                print("load weights: success")
+            else:
+                model = resnet50.ResNet50(weights=None)
     return model
 
 def calculate_fitness(genom, model_name):

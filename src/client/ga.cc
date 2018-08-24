@@ -50,13 +50,15 @@ GeneticAlgorithm GeneticAlgorithm::setup(std::string filepath) {
                       generation.individuals_size(),
                       Options::GetCrossRate(),Options::GetMutationRate(),
                       Options::GetMaxGeneration());
-  
-  std::ofstream ofs(filepath+"/metadata.txt", std::ios::app);
-  ofs << "Genom Length: " << ga.genom_length_ << std::endl;
-  ofs << "The number of Genom: " << ga.genom_num_ << std::endl;
-  ofs << "Crossover Rate: " << ga.cross_rate_ << std::endl;
-  ofs << "Mutation Rate: " << ga.mutation_rate_ << std::endl;
-  ofs << "The number of Generaion: " << ga.max_generation_ << std::endl;
+
+  if (!Options::ResumeEnable()) {
+    std::ofstream ofs(filepath+"/metadata.txt", std::ios::app);
+    ofs << "Genom Length: " << ga.genom_length_ << std::endl;
+    ofs << "The number of Genom: " << ga.genom_num_ << std::endl;
+    ofs << "Crossover Rate: " << ga.cross_rate_ << std::endl;
+    ofs << "Mutation Rate: " << ga.mutation_rate_ << std::endl;
+    ofs << "The number of Generaion: " << ga.max_generation_ << std::endl;
+  }
   
   std::vector<Genom> genoms;
   for (int i = 0; i < generation.individuals_size(); ++i) {
@@ -240,7 +242,8 @@ void GeneticAlgorithm::save(std::string filename) {
 
 void GeneticAlgorithm::run(std::string filepath, GenomEvaluationClient client) {
   Timer timer;
-  for (int i = 0; i < max_generation_; ++i) {
+  for (int i = Options::ResumeFrom();
+       i < Options::ResumeFrom() + max_generation_; ++i) {
     timer.start();
     if (i != 0) {
       /* 次世代集団の作成 */
@@ -294,8 +297,12 @@ int main(int argc, char* argv[]) {
   }
   Options::ParseCommandLine(argc, argv);
   std::stringstream filepath;
-  filepath << "data/" << argv[1] << "_" << timestamp();
-  mkdir(filepath.str().c_str(), 0777);
+  if (Options::ResumeEnable()) {
+    filepath << "data/" << argv[1];
+  } else {
+    filepath << "data/" << argv[1] << "_" << timestamp();
+    mkdir(filepath.str().c_str(), 0777);
+  }
   
   GeneticAlgorithm ga = GeneticAlgorithm::setup(filepath.str());
   GenomEvaluationClient client(
