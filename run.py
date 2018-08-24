@@ -12,8 +12,8 @@ def non_blocking_read(output):
     except:
         return ""
 
-def run(genom_name, model_num):
-    server = subprocess.Popen('python src/services/genom_evaluation_server.py {}'.format(model_num),
+def run(genom_name, model_name):
+    server = subprocess.Popen('python src/services/genom_evaluation_server.py {}'.format(model_name),
                             shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     while True:
         s_line = non_blocking_read(server.stdout)
@@ -26,7 +26,7 @@ def run(genom_name, model_num):
             return
         
     for _ in range(5):
-        client = subprocess.Popen('./bin/client {}'.format(genom_name), shell=True,
+        client = subprocess.Popen('./bin/client {} {}'.format(genom_name, model_name), shell=True,
                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         while True:
             s_line = non_blocking_read(server.stdout)
