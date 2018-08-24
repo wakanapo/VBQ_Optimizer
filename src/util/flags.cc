@@ -45,7 +45,7 @@ void SetFlag(std::string str, flags_type& flags) {
 
 void Options::ParseCommandLine(int argc, char* argv[]) {
   if (argc < 2) {
-    std::cerr << "Usage ./bin/client <first genom file>." << std::endl;
+    std::cerr << "Usage ./bin/client <first genom file> <filename>." << std::endl;
     exit(1);
   }
 
@@ -59,8 +59,8 @@ void Options::ParseCommandLine(int argc, char* argv[]) {
   flags.insert(std::make_pair("resume_from", [](std::string flag_value) {
         g_resume = true;
         g_resume_from = StringToInt(flag_value);}));
-  if (argc > 2)
-    SetFlag(argv[2], flags);
+  if (argc > 3)
+    SetFlag(argv[3], flags);
   std::stringstream filename;
   if (g_resume) {
     filename << "data/" << argv[1] << "/generation" <<
