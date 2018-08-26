@@ -64,7 +64,7 @@ void Options::ParseCommandLine(int argc, char* argv[]) {
   std::stringstream filename;
   if (g_resume) {
     filename << "data/" << argv[1] << "/generation" <<
-      std::setw(3) << std::setfill('0') << g_resume_from << ".pb";
+      std::setw(3) << std::setfill('0') << g_resume_from-1 << ".pb";
   } else {
     filename << "data/" << argv[1] << ".pb";
   }

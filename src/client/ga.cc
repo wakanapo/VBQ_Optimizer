@@ -245,7 +245,7 @@ void GeneticAlgorithm::run(std::string filepath, GenomEvaluationClient client) {
   for (int i = Options::ResumeFrom();
        i < Options::ResumeFrom() + max_generation_; ++i) {
     timer.start();
-    if (i != 0) {
+    if (Options::ResumeEnable() || i != 0) {
       /* 次世代集団の作成 */
       std::cerr << "Creating next generation ..... ";
       nextGenerationGeneCreate();
