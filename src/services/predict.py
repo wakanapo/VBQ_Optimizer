@@ -52,10 +52,14 @@ if __name__=='__main__':
                [(7500, 10000), (0, 2500)], [(0, 2500), (5000, 7500)],
                [(2500, 5000), (7500, 10000)]]
     print("data load: success.")
+    X = np.array()
+    y = np.array()
     for d in get_dir(dirname):
         for d2 in os.listdir(d):
             path = d + "/" + d2
             if os.path.isdir(path):
-                ds = dataset[int(d2[6])]
+                for pertation in dataset[int(d2[6])]:
+                    X = np.vstack((X, val_X[partation[0]:partation[1]]))
+                    y = np.vstack((y, val_y[partition[0]:partition[1]]))
                 accuracy = predict(get_best_genom(path), model_name, X, y)
                 print(path, "acc: {}".format(accuracy))
