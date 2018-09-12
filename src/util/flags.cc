@@ -59,8 +59,8 @@ void Options::ParseCommandLine(int argc, char* argv[]) {
   flags.insert(std::make_pair("resume_from", [](std::string flag_value) {
         g_resume = true;
         g_resume_from = StringToInt(flag_value);}));
-  if (argc > 3)
-    SetFlag(argv[3], flags);
+  if (argc > 4)
+    SetFlag(argv[4], flags);
   std::stringstream filename;
   if (g_resume) {
     filename << "data/" << argv[1] << "/generation" <<

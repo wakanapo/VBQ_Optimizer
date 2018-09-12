@@ -10,7 +10,7 @@ import pickle
 def load():
     with open("data/ILSVRC2012/imagenet_val_labels_for_keras.pkl", 'rb') as f:
         labels = pickle.load(f)
-    labels = np.identity(1000)[labels[:10000]]
+    labels = np.identity(1000)[labels[:5000]]
     
     imgs = []
     for i in tqdm(range(len(labels))):

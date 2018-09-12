@@ -74,11 +74,12 @@ def model_selector(model_name, weights=True):
                 model = resnet50.ResNet50(weights=None)
     return model
 
-def calculate_fitness(genom, model_name):
+def calculate_fitness(genom, model_name, quantize_layer):
     with K.get_session().graph.as_default():
         print("start evaluation!")
         model = model_selector(model_name, weights=False)
-        W_q = list(map(converter(genom.gene), copy.deepcopy(g_W)))
+        W_q = copy.deepcopy(g_W)
+        converter(genom.gene)(W_q[quantize_layer])
         print("quantize: success.")
         model.set_weights(W_q)
         model.compile(optimizer=optimizers.Adam(),
@@ -89,15 +90,16 @@ def calculate_fitness(genom, model_name):
     return score[1]
 
 class GenomEvaluationServicer(genom_pb2_grpc.GenomEvaluationServicer):
-    def __init__(self, genom_name):
+    def __init__(self, genom_name, quantize_layer):
         self.genom_name_ = genom_name
+        self.quantize_layer_ = quantize_layer
         
     def GetIndividual(self, request, context):
         return genom_pb2.Individual(genom=request,
                                     evaluation=calculate_fitness(request,
-                                                                 self.genom_name_))
+                                                                 self.genom_name_, self.quantize_layer_))
 
-def serve(model_name):
+def serve(model_name, quantize_layer):
     global val_X, val_y, g_W
     val_X, val_y = data_selector(model_name)
     print("data load: success.")
@@ -108,7 +110,7 @@ def serve(model_name):
     sys.stdout.flush()
     server = grpc.server(futures.ThreadPoolExecutor())
     genom_pb2_grpc.add_GenomEvaluationServicer_to_server(
-        GenomEvaluationServicer(model_name), server)
+        GenomEvaluationServicer(model_name, quantize_layer), server)
     server.add_insecure_port('[::]:50051')
     server.start()
     try:
@@ -119,8 +121,8 @@ def serve(model_name):
 
 if __name__=='__main__':
     argv = sys.argv
-    if len(argv) < 2:
-        print("Please set model name.")
+    if len(argv) < 3:
+        print("Please set model name and quantize layer.")
         exit()
-    serve(argv[1])
+    serve(argv[1], int(argv[2]))
 

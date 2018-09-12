@@ -12,8 +12,8 @@ def non_blocking_read(output):
     except:
         return ""
 
-def run(genom_name, model_name):
-    server = subprocess.Popen('python src/services/genom_evaluation_server.py {}'.format(model_name),
+def run(genom_name, model_name, quantize_layer):
+    server = subprocess.Popen('python src/services/genom_evaluation_server.py {} {}'.format(model_name, quantize_layer),
                             shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     while True:
         s_line = non_blocking_read(server.stdout)
@@ -25,8 +25,8 @@ def run(genom_name, model_name):
             print('Server Error.')
             return
         
-    for _ in range(5):
-        client = subprocess.Popen('./bin/client {} {}'.format(genom_name, model_name), shell=True,
+    for _ in range(1):
+        client = subprocess.Popen('./bin/client {} {} {}'.format(genom_name, model_name, quantize_layer), shell=True,
                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         while True:
             s_line = non_blocking_read(server.stdout)
@@ -46,8 +46,8 @@ def run(genom_name, model_name):
         
 if __name__=='__main__':
     argv = sys.argv
-    if len(argv) != 3:
-        print('Usage: python ga_executor.py <genom name> <model name>')
+    if len(argv) != 4:
+        print('Usage: python ga_executor.py <genom name> <model name> <quantize_layer>')
         exit()
-    run(argv[1], argv[2])
+    run(argv[1], argv[2], argv[3])
 

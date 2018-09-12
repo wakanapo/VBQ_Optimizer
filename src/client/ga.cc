@@ -291,8 +291,8 @@ std::string timestamp() {
 }
 
 int main(int argc, char* argv[]) {
-  if (argc < 3) {
-    std::cerr << "Usage: ./bin/ga first_genom_file model_name" << std::endl;
+  if (argc < 4) {
+    std::cerr << "Usage: ./bin/ga first_genom_file model_name quantize_layer" << std::endl;
     return 1;
   }
   Options::ParseCommandLine(argc, argv);
@@ -300,7 +300,7 @@ int main(int argc, char* argv[]) {
   if (Options::ResumeEnable()) {
     filepath << "data/" << argv[1];
   } else {
-    filepath << "data/" << argv[2] << "_" << argv[1] << "_" << timestamp();
+    filepath << "data/" << argv[2] << "_" << argv[1] << "_"<< argv[3] << "_" << timestamp();
     mkdir(filepath.str().c_str(), 0777);
   }
   
