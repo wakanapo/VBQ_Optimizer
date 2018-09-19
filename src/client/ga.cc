@@ -19,6 +19,7 @@
 #include <grpcpp/security/credentials.h>
 
 #include "ga.hpp"
+#include "get_server_node.hpp"
 #include "util/color.hpp"
 #include "util/flags.hpp"
 #include "util/timer.hpp"
@@ -240,7 +241,8 @@ void GeneticAlgorithm::save(std::string filename) {
     std::cerr << "Failed to save genoms." << std::endl;
 }
 
-void GeneticAlgorithm::run(std::string filepath, GenomEvaluationClient client) {
+void GeneticAlgorithm::run(std::string filepath,
+                           std::vector<GenomEvaluationClient*> clients) {
   Timer timer;
   for (int i = Options::ResumeFrom();
        i < Options::ResumeFrom() + max_generation_; ++i) {
@@ -253,17 +255,18 @@ void GeneticAlgorithm::run(std::string filepath, GenomEvaluationClient client) {
     }
 
     std::cerr << "Evaluating genoms on server ..... " << std::endl;
-    for (Genom& genom: genoms_) {
-      if (genom.getEvaluation() <= 0) {
+    for (int g_id = 0; g_id < genoms_.size(); ++g_id) {
+      Genom* genom = &genoms_[g_id];
+      if (genom->getEvaluation() <= 0) {
         GenomEvaluation::Individual individual;
         GenomEvaluation::Genom* genes = new GenomEvaluation::Genom();
-        for (auto gene : genom.getGenom()) {
+        for (auto gene : genom->getGenom()) {
           genes->mutable_gene()->Add(gene);
         }
-        client.GetIndividualWithEvaluation(*genes, &individual);
-        genom.setEvaluation(individual.evaluation());
+        clients[g_id % clients.size()]->GetIndividualWithEvaluation(*genes, &individual);
+        genom->setEvaluation(individual.evaluation());
       }
-      genom.setRandomEvaluation();
+      genom->setRandomEvaluation();
     }
     std::cerr << coloringText("Finish Evaluation!", GREEN) << std::endl;
 
@@ -305,8 +308,11 @@ int main(int argc, char* argv[]) {
   }
   
   GeneticAlgorithm ga = GeneticAlgorithm::setup(filepath.str());
-  GenomEvaluationClient client(
-    grpc::CreateChannel("localhost:50051",
-                        grpc::InsecureChannelCredentials()));
-  ga.run(filepath.str(), std::move(client));
+  std::vector<GenomEvaluationClient*> clients;
+  Nodes nodes = Nodes::setup();
+  for (auto node : nodes.getAddresses()) {
+    clients.push_back(new GenomEvaluationClient(grpc::CreateChannel(node+":50051",
+                                                grpc::InsecureChannelCredentials())));
+  }
+  ga.run(filepath.str(), clients);
 }
