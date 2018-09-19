@@ -6,6 +6,6 @@ class Nodes {
   static Nodes setup();
   const std::vector<std::string>& getAddresses();
  private:
-  Nodes();
+  Nodes() {};
   std::vector<std::string> ports_;
 };

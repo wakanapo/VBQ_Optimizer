@@ -4,7 +4,7 @@
 
 #include "get_server_node.hpp"
 
-std::vector<std::string> getNodes(std::string& filename) {
+std::vector<std::string> getNodenames(std::string& filename) {
   std::vector<std::string> nodes;
   std::string line;
   std::ifstream ifs(filename);
@@ -42,18 +42,18 @@ std::string findIP(std::string& filename, std::string nodename) {
   exit(1);
 }
 
-Server Server::setup() {
+Nodes Nodes::setup() {
   std::string host_file = std::getenv("GA_HOSTFILE");
   std::string hosts = std::getenv("HOSTS");
-  std::vector<std::string> nodes = getNodes(host_file);
-  Server server;
-  for (auto n : nodes) {
-    server.ports_.push_back(findIP(hosts, n));
+  std::vector<std::string> nodenames = getNodenames(host_file);
+  Nodes nodes;
+  for (auto n : nodenames) {
+    nodes.ports_.push_back(findIP(hosts, n));
   }
-  return server;
+  return nodes;
 }
 
-const std::vector<std::string>& Server::getPorts() {
+const std::vector<std::string>& Nodes::getAddresses() {
   return ports_;
 }
 
