@@ -18,6 +18,7 @@ public:
     stub_(GenomEvaluation::GenomEvaluation::NewStub(channel)) {};
   bool GetIndividualWithEvaluation(const GenomEvaluation::Genom& genom,
                                    GenomEvaluation::Individual* individual);
+  void StopServer();
 private:
   std::unique_ptr<GenomEvaluation::GenomEvaluation::Stub> stub_;
 };

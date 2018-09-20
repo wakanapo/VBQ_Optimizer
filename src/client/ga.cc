@@ -255,18 +255,25 @@ void GeneticAlgorithm::run(std::string filepath,
     }
 
     std::cerr << "Evaluating genoms on server ..... " << std::endl;
+    std::vector<std::thread> threads;
     for (int g_id = 0; g_id < (int)genoms_.size(); ++g_id) {
       Genom* genom = &genoms_[g_id];
-      if (genom->getEvaluation() <= 0) {
-        GenomEvaluation::Individual individual;
-        GenomEvaluation::Genom* genes = new GenomEvaluation::Genom();
-        for (auto gene : genom->getGenom()) {
-          genes->mutable_gene()->Add(gene);
-        }
-        clients[g_id % clients.size()]->GetIndividualWithEvaluation(*genes, &individual);
-        genom->setEvaluation(individual.evaluation());
-      }
-      genom->setRandomEvaluation();
+      auto client = clients[g_id % clients.size()];
+      threads.push_back(std::thread([genom, client] {
+            if (genom->getEvaluation() <= 0) {
+              GenomEvaluation::Individual individual;
+              GenomEvaluation::Genom* genes = new GenomEvaluation::Genom();
+              for (auto gene : genom->getGenom()) {
+                genes->mutable_gene()->Add(gene);
+              }
+              client->GetIndividualWithEvaluation(*genes, &individual);
+              genom->setEvaluation(individual.evaluation());
+            }
+            genom->setRandomEvaluation();}));
+    }
+
+    for (std::thread& th : threads) {
+      th.join();
     }
     std::cerr << coloringText("Finish Evaluation!", GREEN) << std::endl;
 
@@ -278,6 +285,9 @@ void GeneticAlgorithm::run(std::string filepath,
     print(i, filepath);
     timer.show(SEC, "Generation" + std::to_string(i) + "\n");
     timer.save(SEC, filepath+"/log.txt");
+  }
+  for (auto client : clients) {
+    client->StopServer();
   }
 }
 
