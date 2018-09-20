@@ -79,7 +79,13 @@ def calculate_fitness(genom, model_name, quantize_layer):
         print("start evaluation!")
         model = model_selector(model_name, weights=False)
         W_q = copy.deepcopy(g_W)
-        converter(genom.gene)(W_q[quantize_layer])
+        if quantize_layer == -1:
+            W_q[::2] = list(map(converter(genom.gene), W_q[::2]))
+        elif quantize_layer*2 < len(W_q):
+            W_q[quantize_layer*2] = converter(genom.gene)(W_q[quantize_layer*2])
+        else:
+            sys.stderr.write("quantize_layer is out of index.")
+            exit(1)
         print("quantize: success.")
         model.set_weights(W_q)
         model.compile(optimizer=optimizers.Adam(),
