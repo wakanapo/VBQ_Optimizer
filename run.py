@@ -15,7 +15,7 @@ def non_blocking_read(output):
 def get_first_node(filename):
     with open(filename, 'r') as f:
         line = f.readline()
-        return line.split(' ')[0]
+        return line.split()[0]
 
 def run(genom_name, model_name, quantize_layer):
     server = subprocess.Popen('python src/services/genom_evaluation_server.py {} {}'.format(model_name, quantize_layer),
