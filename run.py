@@ -30,7 +30,9 @@ def run(genom_name, model_name, quantize_layer):
                 print('Server Error.')
                 return
     hostname = os.uname()[1]
-    if hostname == get_first_node(os.environ['GA_HOSTFILE']):
+    client_node = get_first_node(os.environ['GA_HOSTFILE'])
+    if hostname in client_node or client_node in hostname:
+        print("{} is a client node.".format(hostname))
         client = subprocess.Popen('./bin/client {} {} {}'
                                   .format(genom_name, model_name, quantize_layer), shell=True,
                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
