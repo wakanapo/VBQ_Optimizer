@@ -26,7 +26,7 @@ public:
   Genom mutation(const Genom& parent) const;
   void nextGenerationGeneCreate();
   int randomGenomIndex() const;
-  void run(std::string filename, GenomEvaluationClient client);
+  void run(std::string filename, std::vector<GenomEvaluationClient*> clients);
   void save(std::string filepath);
   void print(int i, std::string filepath);
 private:

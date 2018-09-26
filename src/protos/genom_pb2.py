@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='genom.proto',
   package='GenomEvaluation',
   syntax='proto3',
-  serialized_pb=_b('\n\x0bgenom.proto\x12\x0fGenomEvaluation\"\x19\n\x05Genom\x12\x10\n\x04gene\x18\x01 \x03(\x02\x42\x02\x10\x01\"G\n\nIndividual\x12%\n\x05genom\x18\x01 \x01(\x0b\x32\x16.GenomEvaluation.Genom\x12\x12\n\nevaluation\x18\x02 \x01(\x02\">\n\nGeneration\x12\x30\n\x0bindividuals\x18\x01 \x03(\x0b\x32\x1b.GenomEvaluation.Individual2Y\n\x0fGenomEvaluation\x12\x46\n\rGetIndividual\x12\x16.GenomEvaluation.Genom\x1a\x1b.GenomEvaluation.Individual\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\x0bgenom.proto\x12\x0fGenomEvaluation\"\x19\n\x05Genom\x12\x10\n\x04gene\x18\x01 \x03(\x02\x42\x02\x10\x01\"G\n\nIndividual\x12%\n\x05genom\x18\x01 \x01(\x0b\x32\x16.GenomEvaluation.Genom\x12\x12\n\nevaluation\x18\x02 \x01(\x02\">\n\nGeneration\x12\x30\n\x0bindividuals\x18\x01 \x03(\x0b\x32\x1b.GenomEvaluation.Individual\"\x07\n\x05\x45mpty2\x99\x01\n\x0fGenomEvaluation\x12\x46\n\rGetIndividual\x12\x16.GenomEvaluation.Genom\x1a\x1b.GenomEvaluation.Individual\"\x00\x12>\n\nStopServer\x12\x16.GenomEvaluation.Empty\x1a\x16.GenomEvaluation.Empty\"\x00\x62\x06proto3')
 )
 
 
@@ -38,7 +38,7 @@ _GENOM = _descriptor.Descriptor(
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\020\001')), file=DESCRIPTOR),
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\020\001'))),
   ],
   extensions=[
   ],
@@ -69,14 +69,14 @@ _INDIVIDUAL = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
+      options=None),
     _descriptor.FieldDescriptor(
       name='evaluation', full_name='GenomEvaluation.Individual.evaluation', index=1,
       number=2, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
@@ -107,7 +107,7 @@ _GENERATION = _descriptor.Descriptor(
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
+      options=None),
   ],
   extensions=[
   ],
@@ -124,11 +124,36 @@ _GENERATION = _descriptor.Descriptor(
   serialized_end=194,
 )
 
+
+_EMPTY = _descriptor.Descriptor(
+  name='Empty',
+  full_name='GenomEvaluation.Empty',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=196,
+  serialized_end=203,
+)
+
 _INDIVIDUAL.fields_by_name['genom'].message_type = _GENOM
 _GENERATION.fields_by_name['individuals'].message_type = _INDIVIDUAL
 DESCRIPTOR.message_types_by_name['Genom'] = _GENOM
 DESCRIPTOR.message_types_by_name['Individual'] = _INDIVIDUAL
 DESCRIPTOR.message_types_by_name['Generation'] = _GENERATION
+DESCRIPTOR.message_types_by_name['Empty'] = _EMPTY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Genom = _reflection.GeneratedProtocolMessageType('Genom', (_message.Message,), dict(
@@ -152,6 +177,13 @@ Generation = _reflection.GeneratedProtocolMessageType('Generation', (_message.Me
   ))
 _sym_db.RegisterMessage(Generation)
 
+Empty = _reflection.GeneratedProtocolMessageType('Empty', (_message.Message,), dict(
+  DESCRIPTOR = _EMPTY,
+  __module__ = 'genom_pb2'
+  # @@protoc_insertion_point(class_scope:GenomEvaluation.Empty)
+  ))
+_sym_db.RegisterMessage(Empty)
+
 
 _GENOM.fields_by_name['gene'].has_options = True
 _GENOM.fields_by_name['gene']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\020\001'))
@@ -162,8 +194,8 @@ _GENOMEVALUATION = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=196,
-  serialized_end=285,
+  serialized_start=206,
+  serialized_end=359,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetIndividual',
@@ -172,6 +204,15 @@ _GENOMEVALUATION = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_GENOM,
     output_type=_INDIVIDUAL,
+    options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='StopServer',
+    full_name='GenomEvaluation.GenomEvaluation.StopServer',
+    index=1,
+    containing_service=None,
+    input_type=_EMPTY,
+    output_type=_EMPTY,
     options=None,
   ),
 ])

@@ -79,7 +79,13 @@ def calculate_fitness(genom, model_name, quantize_layer):
         print("start evaluation!")
         model = model_selector(model_name, weights=False)
         W_q = copy.deepcopy(g_W)
-        converter(genom.gene)(W_q[quantize_layer])
+        if quantize_layer == -1:
+            W_q[::2] = list(map(converter(genom.gene), W_q[::2]))
+        elif quantize_layer*2 < len(W_q):
+            W_q[quantize_layer*2] = converter(genom.gene)(W_q[quantize_layer*2])
+        else:
+            sys.stderr.write("quantize_layer is out of index.")
+            exit(1)
         print("quantize: success.")
         model.set_weights(W_q)
         model.compile(optimizer=optimizers.Adam(),
@@ -90,14 +96,19 @@ def calculate_fitness(genom, model_name, quantize_layer):
     return score[1]
 
 class GenomEvaluationServicer(genom_pb2_grpc.GenomEvaluationServicer):
-    def __init__(self, genom_name, quantize_layer):
+    def __init__(self, genom_name, quantize_layer, server):
         self.genom_name_ = genom_name
         self.quantize_layer_ = quantize_layer
-        
+        self.server_ = server
+
     def GetIndividual(self, request, context):
         return genom_pb2.Individual(genom=request,
                                     evaluation=calculate_fitness(request,
                                                                  self.genom_name_, self.quantize_layer_))
+
+    def StopServer(self):
+        self.server_.stop(30)
+        return genom_pb2.Empty()
 
 def serve(model_name, quantize_layer):
     global val_X, val_y, g_W
@@ -110,7 +121,7 @@ def serve(model_name, quantize_layer):
     sys.stdout.flush()
     server = grpc.server(futures.ThreadPoolExecutor())
     genom_pb2_grpc.add_GenomEvaluationServicer_to_server(
-        GenomEvaluationServicer(model_name, quantize_layer), server)
+        GenomEvaluationServicer(model_name, quantize_layer, server), server)
     server.add_insecure_port('[::]:50051')
     server.start()
     try:

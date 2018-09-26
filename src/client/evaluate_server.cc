@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 
 #include "evaluate_server.hpp"
 #include "util/color.hpp"
@@ -11,6 +12,8 @@ GetIndividualWithEvaluation(const GenomEvaluation::Genom& genom,
   if (!status.ok()) {
     std::cerr << coloringText("ERROR:", RED)
               << "GetIndividual rpc faild." << std::endl;
+    std::cerr << status.error_code() << ": "
+              << status.error_message() << std::endl;
     return false;
   }
   if (!individual->has_genom()) {
@@ -19,4 +22,10 @@ GetIndividualWithEvaluation(const GenomEvaluation::Genom& genom,
     return false;
   }
   return true;
+}
+
+void GenomEvaluationClient::StopServer() {
+  grpc::ClientContext context;
+  grpc::Status status = stub_->StopServer(&context,  GenomEvaluation::Empty(),
+                                          new GenomEvaluation::Empty());
 }

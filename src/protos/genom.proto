@@ -3,6 +3,7 @@ package GenomEvaluation;
 
 service GenomEvaluation {
   rpc GetIndividual(Genom) returns (Individual) {};
+  rpc StopServer(Empty) returns (Empty) {};
 }
 
 message Genom {
@@ -17,3 +18,5 @@ message Individual {
 message Generation {
   repeated Individual individuals = 1;
 }
+
+message Empty {}

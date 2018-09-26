@@ -19,6 +19,7 @@
 #include <grpcpp/security/credentials.h>
 
 #include "ga.hpp"
+#include "get_server_node.hpp"
 #include "util/color.hpp"
 #include "util/flags.hpp"
 #include "util/timer.hpp"
@@ -240,7 +241,8 @@ void GeneticAlgorithm::save(std::string filename) {
     std::cerr << "Failed to save genoms." << std::endl;
 }
 
-void GeneticAlgorithm::run(std::string filepath, GenomEvaluationClient client) {
+void GeneticAlgorithm::run(std::string filepath,
+                           std::vector<GenomEvaluationClient*> clients) {
   Timer timer;
   for (int i = Options::ResumeFrom();
        i < Options::ResumeFrom() + max_generation_; ++i) {
@@ -253,17 +255,25 @@ void GeneticAlgorithm::run(std::string filepath, GenomEvaluationClient client) {
     }
 
     std::cerr << "Evaluating genoms on server ..... " << std::endl;
-    for (Genom& genom: genoms_) {
-      if (genom.getEvaluation() <= 0) {
-        GenomEvaluation::Individual individual;
-        GenomEvaluation::Genom* genes = new GenomEvaluation::Genom();
-        for (auto gene : genom.getGenom()) {
-          genes->mutable_gene()->Add(gene);
-        }
-        client.GetIndividualWithEvaluation(*genes, &individual);
-        genom.setEvaluation(individual.evaluation());
-      }
-      genom.setRandomEvaluation();
+    std::vector<std::thread> threads;
+    for (int g_id = 0; g_id < (int)genoms_.size(); ++g_id) {
+      Genom* genom = &genoms_[g_id];
+      auto client = clients[g_id % clients.size()];
+      threads.push_back(std::thread([genom, client] {
+            if (genom->getEvaluation() <= 0) {
+              GenomEvaluation::Individual individual;
+              GenomEvaluation::Genom* genes = new GenomEvaluation::Genom();
+              for (auto gene : genom->getGenom()) {
+                genes->mutable_gene()->Add(gene);
+              }
+              client->GetIndividualWithEvaluation(*genes, &individual);
+              genom->setEvaluation(individual.evaluation());
+            }
+            genom->setRandomEvaluation();}));
+    }
+
+    for (std::thread& th : threads) {
+      th.join();
     }
     std::cerr << coloringText("Finish Evaluation!", GREEN) << std::endl;
 
@@ -275,6 +285,9 @@ void GeneticAlgorithm::run(std::string filepath, GenomEvaluationClient client) {
     print(i, filepath);
     timer.show(SEC, "Generation" + std::to_string(i) + "\n");
     timer.save(SEC, filepath+"/log.txt");
+  }
+  for (auto client : clients) {
+    client->StopServer();
   }
 }
 
@@ -305,8 +318,11 @@ int main(int argc, char* argv[]) {
   }
   
   GeneticAlgorithm ga = GeneticAlgorithm::setup(filepath.str());
-  GenomEvaluationClient client(
-    grpc::CreateChannel("localhost:50051",
-                        grpc::InsecureChannelCredentials()));
-  ga.run(filepath.str(), std::move(client));
+  std::vector<GenomEvaluationClient*> clients;
+  Nodes nodes = Nodes::setup();
+  for (auto node : nodes.getAddresses()) {
+    clients.push_back(new GenomEvaluationClient(grpc::CreateChannel(node+":50051",
+                                                grpc::InsecureChannelCredentials())));
+  }
+  ga.run(filepath.str(), clients);
 }
